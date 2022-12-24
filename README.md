@@ -130,6 +130,7 @@ git_implementation: go-git
 registry:
   server: ""
   repository: ""
+  ca_cert_data: ""
 
 gitops:
   access_secret: git-secret
