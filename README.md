@@ -92,7 +92,7 @@ The Cartographer Supply Chains package has the following configurable properties
 
 | Config | Default | Description |
 |-------|-------------------|-------------|
-| `supply_chain` | `basic` | The type of supply chain to use for this golden path. Options: `basic`, `testing`, `testing_scanning`. |
+| `supply_chain` | `basic` | The type of supply chain to use for this golden path. Options: `basic`, `advanced`. |
 | `service_account` | `default` | The ServiceAccount used by the supply chain. |
 | `cluster_builder` | `default` | The ClusterBuilder used by kpack. |
 | `git_implementation` | `go-git` | The Git implementation used by Flux. |
