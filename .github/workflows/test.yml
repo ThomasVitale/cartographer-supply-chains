@@ -1,0 +1,21 @@
+name: Test
+
+on:
+  - push
+
+jobs:
+  test-config:
+    name: Configuration Tests
+    permissions:
+      contents: read
+    uses: arktonix/cloud-native-utils/.github/workflows/package-test-config.yml@main
+    with:
+      command: make test-config
+
+  test-integration:
+    name: Integration Tests
+    permissions:
+      contents: read
+    uses: arktonix/cloud-native-utils/.github/workflows/package-test-integration.yml@main
+    with:
+      command: make test-integration

@@ -1,0 +1,90 @@
+#@ load("@ytt:data", "data")
+#@ load("/helpers.star", "config_writer")
+
+#@ if/end data.values.supply_chain == "basic":
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterSupplyChain
+metadata:
+  name: supply-chain-basic
+spec:
+  selector:
+    apps.kadras.io/workload-type: web
+
+  params:
+    - name: gitops_access_secret
+      default: #@ data.values.gitops.access_secret
+
+  resources:
+    - name: source-provider
+      templateRef:
+        kind: ClusterSourceTemplate
+        name: supplychain-source-template
+      params:
+        - name: serviceAccount
+          value: #@ data.values.service_account
+        - name: gitImplementation
+          value: #@ data.values.git_implementation
+        - name: gitops_access_secret
+          default: #@ data.values.gitops.access_secret
+    
+    - name: source-tester
+      templateRef:
+        kind: ClusterSourceTemplate
+        options:
+          - name: tekton-test-source-template
+            selector:
+              matchExpressions:
+                - { key: apps.kadras.io/has-tests, operator: Exists }
+          - passThrough: source
+            selector:
+              matchExpressions:
+                - { key: apps.kadras.io/has-tests, operator: DoesNotExist }
+      sources:
+        - resource: source-provider
+          name: source
+
+    - name: image-builder
+      templateRef:
+        kind: ClusterImageTemplate
+        name: kpack-template
+      params:
+        - name: serviceAccount
+          value: #@ data.values.service_account
+        - name: registry
+          value: #@ data.values.registry
+        - name: clusterBuilder
+          default: #@ data.values.cluster_builder
+      sources:
+        - resource: source-tester
+          name: source
+    
+    - name: convention-provider
+      templateRef:
+        kind: ClusterConfigTemplate
+        name: convention-template
+      params:
+        - name: serviceAccount
+          value: #@ data.values.service_account
+      images:
+      - resource: image-builder
+        name: image
+    
+    - name: config-provider
+      templateRef:
+        kind: ClusterConfigTemplate
+        name: knative-config-template
+      configs:
+        - resource: convention-provider
+          name: config
+    
+    - name: app-deployer
+      templateRef:
+        kind: ClusterTemplate
+        name: app-local-deployment-template
+      params:
+        - name: serviceAccount
+          value: #@ data.values.service_account
+      configs:
+        - resource: config-provider
+          name: config

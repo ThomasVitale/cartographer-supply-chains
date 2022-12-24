@@ -1,0 +1,157 @@
+apiVersion: data.packaging.carvel.dev/v1alpha1
+kind: Package
+metadata:
+  creationTimestamp: null
+  name: cartographer-supply-chains.packages.kadras.io.0.0.0
+spec:
+  licenses:
+  - Apache 2.0
+  refName: cartographer-supply-chains.packages.kadras.io
+  releasedAt: null
+  template:
+    spec:
+      deploy:
+      - kapp: {}
+      fetch:
+      - git: {}
+      template:
+      - ytt:
+          paths:
+          - config
+      - kbld: {}
+  valuesSchema:
+    openAPIv3:
+      type: object
+      additionalProperties: false
+      properties:
+        supply_chain:
+          type: string
+          description: The type of supply chain to use
+          default: basic
+        service_account:
+          type: string
+          description: The ServiceAccount used by the supply chain
+          default: default
+        cluster_builder:
+          type: string
+          description: The ClusterBuilder used by kpack
+          default: default
+        git_implementation:
+          type: string
+          description: The Git implementation used by Flux
+          default: go-git
+        registry:
+          type: object
+          additionalProperties: false
+          description: Configuration for the OCI Registry where to store the application images
+          properties:
+            server:
+              type: string
+              description: The server of the OCI Registry where to store the application images
+              default: ""
+            repository:
+              type: string
+              description: The repository under an OCI Registry where to store the application images
+              default: ""
+        gitops:
+          type: object
+          additionalProperties: false
+          description: Configuration for the GitOps steps in the supply chain
+          properties:
+            access_secret:
+              type: string
+              description: The Secret containing credentials to access the specified Git repository
+              default: git-secret
+            user_name:
+              type: string
+              description: The name of the user interacting with the Git repository
+              default: cartographer
+            user_email:
+              type: string
+              description: The email of the user interacting with the Git repository
+              default: cartographer@kadras.io
+            commit_message:
+              type: string
+              description: The commit message to use when pushing configuration changes to Git
+              default: Update from Cartographer
+            commit_strategy:
+              type: string
+              description: Whether to commit configuration changes to Git directly or via a pull request
+              default: direct
+            branch:
+              type: string
+              description: The branch to use for GitOps activities
+              default: main
+            server_address:
+              type: string
+              description: The server hosting the specified Git repository
+              default: ""
+            repository_owner:
+              type: string
+              description: The owner of the specified Git repository
+              default: ""
+            repository_name:
+              type: string
+              description: The name of the Git repository to use for GitOps
+              default: ""
+            pull_request:
+              type: object
+              additionalProperties: false
+              properties:
+                server_kind:
+                  type: string
+                  description: The type of Git server where to open the pull request
+                  x-example-description: Open a pull request on GitHub
+                  example: github
+                  default: ""
+                commit_branch:
+                  type: string
+                  description: The branch to use to open a pull request. If empty, a random name is generated
+                  default: ""
+                pull_request_title:
+                  type: string
+                  description: The title of the pull request
+                  default: ""
+                pull_request_body:
+                  type: string
+                  description: The body of the pull request
+                  default: ""
+  version: 0.0.0
+
+---
+apiVersion: data.packaging.carvel.dev/v1alpha1
+kind: PackageMetadata
+metadata:
+  creationTimestamp: null
+  name: cartographer-supply-chains.packages.kadras.io
+spec:
+  categories:
+  - ci/cd
+  - golden paths
+  - platform engineering
+  displayName: cartographer-supply-chains
+  longDescription: Cartographer supply chains used to build golden paths to production for
+    applications and functions.
+  maintainers:
+  - name: Thomas Vitale
+  providerName: Arktonix
+  shortDescription: Supply chains for applications and functions.
+
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  annotations:
+    kctrl.carvel.dev/local-fetch-0: .
+  creationTimestamp: null
+  name: cartographer-supply-chains
+spec:
+  packageRef:
+    refName: cartographer-supply-chains.packages.kadras.io
+    versionSelection:
+      constraints: 0.0.0
+  serviceAccountName: kadras-install-sa
+status:
+  conditions: null
+  friendlyDescription: ""
+  observedGeneration: 0
