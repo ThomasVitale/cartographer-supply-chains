@@ -134,7 +134,7 @@ spec:
     applications and functions.
   maintainers:
   - name: Thomas Vitale
-  providerName: Arktonix
+  providerName: Kadras
   shortDescription: Supply chains for applications and functions.
 
 ---

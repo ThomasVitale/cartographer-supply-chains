@@ -19,14 +19,14 @@ kapp deploy -a kapp-controller -y \
   -f https://github.com/vmware-tanzu/carvel-kapp-controller/releases/latest/download/release.yml
 
 kapp deploy -a kadras-repo -y \
-    -f https://github.com/arktonix/kadras-packages/releases/latest/download/package-repository.yml
+    -f https://github.com/kadras-io/kadras-packages/releases/latest/download/package-repository.yml
 
 kapp deploy -a test-dependencies -f test/test-dependencies -y
 
 kubectl create namespace kadras-packages
 kapp deploy -a cartographer-blueprints-package -n kadras-packages -y \
-  -f https://github.com/arktonix/cartographer-blueprints/releases/latest/download/metadata.yml \
-  -f https://github.com/arktonix/cartographer-blueprints/releases/latest/download/package.yml
+  -f https://github.com/kadras-io/cartographer-blueprints/releases/latest/download/metadata.yml \
+  -f https://github.com/kadras-io/cartographer-blueprints/releases/latest/download/package.yml
 
 kctrl package install -i cartographer-blueprints \
   -p cartographer-blueprints.packages.kadras.io \
