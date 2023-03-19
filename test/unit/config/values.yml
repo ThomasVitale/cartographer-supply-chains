@@ -1,0 +1,4 @@
+---
+registry:
+  server: ghcr.io
+  repository: thomasvitale/carto
