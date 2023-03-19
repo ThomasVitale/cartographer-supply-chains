@@ -2,8 +2,8 @@ load("@ytt:data", "data")
 load("@ytt:assert", "assert")
 
 def config_writer():
-  if data.values.gitops.commit_strategy == "pull_request":
-    return "config-writer-and-pull-requester-template"
+  if data.values.gitops.strategy == "pull_request":
+    return "tekton-config-writer-and-pull-requester-template"
   end
   return "tekton-config-writer-template"
 end

@@ -11,22 +11,16 @@ spec:
   selector:
     apps.kadras.io/workload-type: web
 
-  params:
-    - name: gitops_access_secret
-      default: #@ data.values.gitops.access_secret
-
   resources:
     - name: source-provider
       templateRef:
         kind: ClusterSourceTemplate
         name: supplychain-source-template
       params:
+        - name: gitAccessSecret
+          default: #@ data.values.git_access_secret
         - name: serviceAccount
-          value: #@ data.values.service_account
-        - name: gitImplementation
-          value: #@ data.values.git_implementation
-        - name: gitops_access_secret
-          default: #@ data.values.gitops.access_secret
+          default: #@ data.values.service_account
     
     - name: source-tester
       templateRef:
@@ -49,12 +43,12 @@ spec:
         kind: ClusterImageTemplate
         name: kpack-template
       params:
-        - name: serviceAccount
-          value: #@ data.values.service_account
-        - name: registry
-          value: #@ data.values.registry
         - name: clusterBuilder
           default: #@ data.values.cluster_builder
+        - name: registry
+          value: #@ data.values.registry
+        - name: serviceAccount
+          default: #@ data.values.service_account
       sources:
         - resource: source-tester
           name: source
@@ -65,7 +59,7 @@ spec:
         name: convention-template
       params:
         - name: serviceAccount
-          value: #@ data.values.service_account
+          default: #@ data.values.service_account
       images:
       - resource: image-builder
         name: image
@@ -84,7 +78,7 @@ spec:
         name: app-local-deployment-template
       params:
         - name: serviceAccount
-          value: #@ data.values.service_account
+          default: #@ data.values.service_account
       configs:
         - resource: config-provider
           name: config

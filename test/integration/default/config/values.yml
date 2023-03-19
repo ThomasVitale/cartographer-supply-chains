@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cartographer-supply-chains-values
+  namespace: tests
+stringData:
+  values.yaml: |
+    registry:
+      server: ghcr.io
+      repository: thomasvitale/carto
