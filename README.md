@@ -118,10 +118,10 @@ flowchart LR;
   D-->E(Scan Image);
   E-->F(Apply Conventions);
   F-->G(Configure Deployment);
-  G-->H(Publish Configuration)
-  I(Monitor Configuration)-->H;
-  I-->J(Deploy Workload)
+  G-->H(Publish Configuration);
 ```
+
+This supply chain needs to be pair with a [delivery chain](https://github.com/kadras-io/cartographer-delivery) that provides the deployment functionality based on GitOps/RegistryOps.
 
 ## 🎯&nbsp; Configuration
 
