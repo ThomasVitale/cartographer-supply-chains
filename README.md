@@ -121,7 +121,7 @@ flowchart LR;
   G-->H(Publish Configuration);
 ```
 
-This supply chain needs to be pair with a [delivery chain](https://github.com/kadras-io/cartographer-delivery) that provides the deployment functionality based on GitOps/RegistryOps.
+This supply chain needs to be paired with a [delivery chain](https://github.com/kadras-io/cartographer-delivery) that provides the deployment functionality based on GitOps/RegistryOps.
 
 ## 🎯&nbsp; Configuration
 
