@@ -32,13 +32,13 @@ commands:
   - script: |
       kubectl config set-context --current --namespace=tests && \
       kapp deploy -a tekton-pipelines-package -y \
-        -f https://github.com/kadras-io/package-for-tekton-pipelines/releases/download/v0.45.0%2Bkadras.1/package.yml \
-        -f https://github.com/kadras-io/package-for-tekton-pipelines/releases/download/v0.45.0%2Bkadras.1/metadata.yml
+        -f https://github.com/kadras-io/package-for-tekton-pipelines/releases/download/v0.46.0/package.yml \
+        -f https://github.com/kadras-io/package-for-tekton-pipelines/releases/download/v0.46.0/metadata.yml
   - script: |
       kubectl config set-context --current --namespace=tests && \
       kapp deploy -a cartographer-blueprints-package -y \
-        -f https://github.com/kadras-io/cartographer-blueprints/releases/download/v0.4.0/package.yml \
-        -f https://github.com/kadras-io/cartographer-blueprints/releases/download/v0.4.0/metadata.yml
+        -f https://github.com/kadras-io/cartographer-blueprints/releases/download/v0.5.0/package.yml \
+        -f https://github.com/kadras-io/cartographer-blueprints/releases/download/v0.5.0/metadata.yml
   - script: |
       kubectl config set-context --current --namespace=tests && \
       kapp deploy -a dependencies -y -f ./test/setup/dependencies
