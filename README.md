@@ -157,7 +157,6 @@ The Cartographer Supply Chains package has the following configurable properties
 | `git_access_secret` | `git-secret` | The Secret containing authentication credentials for the Git repository. |
 | `registry.server` | `""` | The server of the OCI Registry where the supply chain will publish and consume OCI images. **Required**. |
 | `registry.repository` | `""` | The repository in the OCI Registry where the supply chain will publish and consume OCI images. **Required**. |
-| `registry.ca_cert_data` | `""` | PEM-encoded certificate data for the OCI Registry where the supply chain will publish and consume OCI images. |
 
 Settings for using a GitOps strategy with the supply chain.
 
