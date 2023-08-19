@@ -9,12 +9,15 @@ supply_chain: basic
 #@schema/validation min_len=1
 service_account: default
 
+#@schema/desc "PEM-encoded certificate data to trust TLS connections with a custom CA."
+ca_cert_data: ""
+
 #@schema/desc "The default `ClusterBuilder` used by kpack."
 #@schema/validation min_len=1
 cluster_builder: default
 
-#@schema/desc "The Secret containing authentication credentials for the Git repository."
-git_access_secret: supply-chain-git-credentials
+#@schema/desc "The Secret containing authentication credentials for Git repositories."
+git_credentials_secret: ""
 
 #@schema/desc "Settings for the OCI Registry used by the supply chain."
 registry:
@@ -48,6 +51,7 @@ gitops:
   #@schema/desc "The target branch where to push configuration changes."
   target_branch: main
 
+  #@schema/desc "Settings for the Git repository used for the GitOps workflows."
   repository:
     #@schema/desc "The owner of the Git repository."
     owner: ""

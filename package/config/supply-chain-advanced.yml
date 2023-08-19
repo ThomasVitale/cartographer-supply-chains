@@ -11,18 +11,14 @@ spec:
   selector:
     apps.kadras.io/workload-type: web
 
-  params:
-    - name: gitops
-      default: #@ data.values.gitops
-
   resources:
     - name: source-provider
       templateRef:
         kind: ClusterSourceTemplate
         name: supplychain-source-template
       params:
-        - name: gitAccessSecret
-          default: #@ data.values.git_access_secret
+        - name: gitCredentialsSecret
+          default: #@ data.values.git_credentials_secret
         - name: serviceAccount
           default: #@ data.values.service_account
     
@@ -97,6 +93,10 @@ spec:
         kind: ClusterTemplate
         name: #@ config_writer()
       params:
+        - name: ca_cert_data
+          value: #@ data.values.ca_cert_data
+        - name: gitops
+          default: #@ data.values.gitops
         - name: registry
           value: #@ data.values.registry
         - name: serviceAccount
@@ -110,7 +110,9 @@ spec:
         kind: ClusterTemplate
         name: deliverable-template
       params:
-        - name: gitAccessSecret
-          default: #@ data.values.git_access_secret
+        - name: gitCredentialsSecret
+          default: #@ data.values.git_credentials_secret
+        - name: gitops
+          default: #@ data.values.gitops
         - name: registry
           value: #@ data.values.registry

@@ -1,5 +1,5 @@
-load("@ytt:data", "data")
 load("@ytt:assert", "assert")
+load("@ytt:data", "data")
 
 def config_writer():
   if data.values.gitops.strategy == "pull_request":

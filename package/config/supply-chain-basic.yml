@@ -17,26 +17,10 @@ spec:
         kind: ClusterSourceTemplate
         name: supplychain-source-template
       params:
-        - name: gitAccessSecret
-          default: #@ data.values.git_access_secret
+        - name: gitCredentialsSecret
+          default: #@ data.values.git_credentials_secret
         - name: serviceAccount
           default: #@ data.values.service_account
-    
-    - name: source-tester
-      templateRef:
-        kind: ClusterSourceTemplate
-        options:
-          - name: tekton-test-source-template
-            selector:
-              matchExpressions:
-                - { key: apps.kadras.io/has-tests, operator: Exists }
-          - passThrough: source
-            selector:
-              matchExpressions:
-                - { key: apps.kadras.io/has-tests, operator: DoesNotExist }
-      sources:
-        - resource: source-provider
-          name: source
 
     - name: image-builder
       templateRef:
@@ -50,7 +34,7 @@ spec:
         - name: serviceAccount
           default: #@ data.values.service_account
       sources:
-        - resource: source-tester
+        - resource: source-provider
           name: source
     
     - name: convention-provider

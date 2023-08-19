@@ -2,7 +2,7 @@
 
 ![Test Workflow](https://github.com/kadras-io/cartographer-supply-chains/actions/workflows/test.yml/badge.svg)
 ![Release Workflow](https://github.com/kadras-io/cartographer-supply-chains/actions/workflows/release.yml/badge.svg)
-[![The SLSA Level 3 badge](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev/spec/v0.1/levels)
+[![The SLSA Level 3 badge](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev/spec/v1.0/levels)
 [![The Apache 2.0 license badge](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Follow us on Twitter](https://img.shields.io/static/v1?label=Twitter&message=Follow&color=1DA1F2)](https://twitter.com/kadrasIO)
 
@@ -12,7 +12,7 @@ A Carvel package providing [Cartographer](https://cartographer.sh) supply chains
 
 ### Prerequisites
 
-* Kubernetes 1.24+
+* Kubernetes 1.25+
 * Carvel [`kctrl`](https://carvel.dev/kapp-controller/docs/latest/install/#installing-kapp-controller-cli-kctrl) CLI.
 * Carvel [kapp-controller](https://carvel.dev/kapp-controller) deployed in your Kubernetes cluster. You can install it with Carvel [`kapp`](https://carvel.dev/kapp/docs/latest/install) (recommended choice) or `kubectl`.
 
@@ -30,10 +30,9 @@ Cartographer Supply Chains requires the [Cartographer Blueprints](https://github
 Add the Kadras [package repository](https://github.com/kadras-io/kadras-packages) to your Kubernetes cluster:
 
   ```shell
-  kubectl create namespace kadras-packages
   kctrl package repository add -r kadras-packages \
     --url ghcr.io/kadras-io/kadras-packages \
-    -n kadras-packages
+    -n kadras-packages --create-namespace
   ```
 
 <details><summary>Installation without package repository</summary>
@@ -153,8 +152,9 @@ The Cartographer Supply Chains package has the following configurable properties
 |-------|-------------------|-------------|
 | `supply_chain` | `basic` | The type of supply chain to deploy. Options: `basic`, `advanced`. |
 | `service_account` | `default` | The default `ServiceAccount` used by the supply chain. |
+| `ca_cert_data` | `""` | PEM-encoded certificate data to trust TLS connections with a custom CA. |
 | `cluster_builder` | `default` | The default `ClusterBuilder` used by kpack. |
-| `git_access_secret` | `git-secret` | The Secret containing authentication credentials for the Git repository. |
+| `git_credentials_secret` | `""` | The Secret containing authentication credentials for Git repositories. |
 | `registry.server` | `""` | The server of the OCI Registry where the supply chain will publish and consume OCI images. **Required**. |
 | `registry.repository` | `""` | The repository in the OCI Registry where the supply chain will publish and consume OCI images. **Required**. |
 
