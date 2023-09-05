@@ -12,7 +12,7 @@ A Carvel package providing [Cartographer](https://cartographer.sh) supply chains
 
 ### Prerequisites
 
-* Kubernetes 1.25+
+* Kubernetes 1.26+
 * Carvel [`kctrl`](https://carvel.dev/kapp-controller/docs/latest/install/#installing-kapp-controller-cli-kctrl) CLI.
 * Carvel [kapp-controller](https://carvel.dev/kapp-controller) deployed in your Kubernetes cluster. You can install it with Carvel [`kapp`](https://carvel.dev/kapp/docs/latest/install) (recommended choice) or `kubectl`.
 
@@ -101,13 +101,14 @@ The `advanced` supply chain provides a Cartographer path consisting of the follo
 
 * Monitor source code repository with FluxCD;
 * Test source code with Tekton;
-* Scan source code with Grype;
+* Scan source code with Trivy;
 * Transform application source code into OCI images with kpack;
-* Scan image with Grype;
+* Scan image with Trivy;
 * Apply workload conventions (such as Spring Boot) with Cartographer Conventions;
 * Define and configure the workload manifests with Knative and Carvel;
 * Push the workload manifests via GitOps or RegistryOps;
-* Generate the deliverable resource used for deployment on Kubernetes.
+* Generate the deliverable resource used for deployment on Kubernetes (Carvel or Flux);
+* Deploy the workload using Carvel (optional, if not external delivery).
 
 ```mermaid
 flowchart LR;
@@ -118,9 +119,11 @@ flowchart LR;
   E-->F(Apply Conventions);
   F-->G(Configure Deployment);
   G-->H(Publish Configuration);
+  H-->I(Generate Deliverable);
+  I-->J(Deploy Workload);
 ```
 
-This supply chain needs to be paired with a [delivery chain](https://github.com/kadras-io/cartographer-delivery) that provides the deployment functionality based on GitOps/RegistryOps.
+This supply chain can be used in a single cluster setup and take care of the application deployment, or in a multicluster setup and generate the deliverable manifest that can be manually applied to a different cluster to deploy the application via GitOps/RegistryOps.
 
 ## 🎯&nbsp; Configuration
 
@@ -154,7 +157,9 @@ The Cartographer Supply Chains package has the following configurable properties
 | `service_account` | `default` | The default `ServiceAccount` used by the supply chain. |
 | `ca_cert_data` | `""` | PEM-encoded certificate data to trust TLS connections with a custom CA. |
 | `cluster_builder` | `default` | The default `ClusterBuilder` used by kpack. |
+| `external_delivery` | `false` | Whether a deliverable is manually applied to an external Kubernetes cluster. |
 | `git_credentials_secret` | `""` | The Secret containing authentication credentials for Git repositories. |
+| `registry_credentials_secret` | `""` | The Secret containing authentication credentials for the OCI registry. |
 | `registry.server` | `""` | The server of the OCI Registry where the supply chain will publish and consume OCI images. **Required**. |
 | `registry.repository` | `""` | The repository in the OCI Registry where the supply chain will publish and consume OCI images. **Required**. |
 

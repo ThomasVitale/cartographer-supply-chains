@@ -9,7 +9,7 @@ metadata:
   name: supply-chain-advanced
 spec:
   selector:
-    apps.kadras.io/workload-type: web
+    app.kadras.io/workload-type: web
 
   resources:
     - name: source-provider
@@ -29,11 +29,11 @@ spec:
           - name: tekton-test-source-template
             selector:
               matchExpressions:
-                - { key: apps.kadras.io/has-tests, operator: Exists }
+                - { key: app.kadras.io/has-tests, operator: Exists }
           - passThrough: source
             selector:
               matchExpressions:
-                - { key: apps.kadras.io/has-tests, operator: DoesNotExist }
+                - { key: app.kadras.io/has-tests, operator: DoesNotExist }
       sources:
         - resource: source-provider
           name: source
@@ -103,12 +103,20 @@ spec:
           default: #@ data.values.service_account
       configs:
         - resource: config-provider
-          name: config     
-    
-    - name: deliverable
+          name: config   
+
+    - name: deliverable-provider
       templateRef:
-        kind: ClusterTemplate
-        name: deliverable-template
+        kind: ClusterConfigTemplate
+        options:
+          - name: deliverable-carvel-app-config-template
+            selector:
+              matchLabels:
+                app.kadras.io/deliverable-type: carvel-app
+          - name: deliverable-flux-kustomization-template
+            selector:
+              matchLabels:
+                app.kadras.io/deliverable-type: flux-kustomization
       params:
         - name: gitCredentialsSecret
           default: #@ data.values.git_credentials_secret
@@ -116,3 +124,19 @@ spec:
           default: #@ data.values.gitops
         - name: registry
           value: #@ data.values.registry
+        - name: registryCredentialsSecret
+          default: canonical-registry-credentials
+        - name: serviceAccount
+          default: #@ data.values.service_account
+    
+    #@ if/end not data.values.external_delivery:
+    - name: app-deployer
+      templateRef:
+        kind: ClusterTemplate
+        name: app-gitops-deployment-template
+      params:
+        - name: serviceAccount
+          default: #@ data.values.service_account
+      configs:
+        - resource: deliverable-provider
+          name: config

@@ -9,7 +9,7 @@ metadata:
   name: supply-chain-basic
 spec:
   selector:
-    apps.kadras.io/workload-type: web
+    app.kadras.io/workload-type: web
 
   resources:
     - name: source-provider
