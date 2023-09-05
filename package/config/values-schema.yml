@@ -16,8 +16,14 @@ ca_cert_data: ""
 #@schema/validation min_len=1
 cluster_builder: default
 
+#@schema/desc "Whether a deliverable is manually applied to an external Kubernetes cluster."
+external_delivery: false
+
 #@schema/desc "The Secret containing authentication credentials for Git repositories."
 git_credentials_secret: ""
+
+#@schema/desc "The Secret containing authentication credentials for the OCI registry."
+registry_credentials_secret: ""
 
 #@schema/desc "Settings for the OCI Registry used by the supply chain."
 registry:
