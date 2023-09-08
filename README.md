@@ -154,7 +154,7 @@ The Cartographer Supply Chains package has the following configurable properties
 | Config | Default | Description |
 |-------|-------------------|-------------|
 | `supply_chain` | `basic` | The type of supply chain to deploy. Options: `basic`, `advanced`. |
-| `service_account` | `default` | The default `ServiceAccount` used by the supply chain. |
+| `service_account` | `supply-chain` | The default `ServiceAccount` used by the supply chain. |
 | `ca_cert_data` | `""` | PEM-encoded certificate data to trust TLS connections with a custom CA. |
 | `cluster_builder` | `default` | The default `ClusterBuilder` used by kpack. |
 | `external_delivery` | `false` | Whether a deliverable is manually applied to an external Kubernetes cluster. |

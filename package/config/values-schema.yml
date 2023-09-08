@@ -7,7 +7,7 @@ supply_chain: basic
 
 #@schema/desc "The default `ServiceAccount` used by the supply chain."
 #@schema/validation min_len=1
-service_account: default
+service_account: supply-chain
 
 #@schema/desc "PEM-encoded certificate data to trust TLS connections with a custom CA."
 ca_cert_data: ""
