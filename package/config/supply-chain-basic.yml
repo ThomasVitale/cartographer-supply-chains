@@ -10,6 +10,9 @@ metadata:
 spec:
   selector:
     app.kadras.io/workload-type: web
+  
+  serviceAccountRef:
+    name: #@ data.values.service_account
 
   resources:
     - name: source-provider
