@@ -1,0 +1,21 @@
+apiVersion: kpack.io/v1alpha2
+kind: Image
+metadata:
+  name: demo-workload-name
+spec:
+  tag: ghcr.io/mygithuborg/carto/demo-workload-name-demo-workload-namespace
+  serviceAccountName: default
+  builder:
+    kind: ClusterBuilder
+    name: default
+  source:
+    blob:
+      url: source-code-url
+  build:
+    env:
+    - name: BP_OCI_SOURCE
+      value: source-code-revision
+    services: []
+  cache:
+    volume:
+      size: "2Gi"

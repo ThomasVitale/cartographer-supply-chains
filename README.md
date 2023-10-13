@@ -6,7 +6,9 @@
 [![The Apache 2.0 license badge](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Follow us on Twitter](https://img.shields.io/static/v1?label=Twitter&message=Follow&color=1DA1F2)](https://twitter.com/kadrasIO)
 
-A Carvel package providing [Cartographer](https://cartographer.sh) supply chains to build golden paths to production for applications and functions, from source code to deployment in a Kubernetes cluster.
+A Carvel package configuring a set of reusable supply chains, templates and pipelines to provide Kubernetes-native paved paths to production using [Cartographer](https://cartographer.sh).
+
+It handles several activities like source code watching, testing, building, scanning, configuring, delivering, and deploying.
 
 ## 🚀&nbsp; Getting Started
 
@@ -23,7 +25,7 @@ A Carvel package providing [Cartographer](https://cartographer.sh) supply chains
 
 ### Dependencies
 
-Cartographer Supply Chains requires the [Cartographer Blueprints](https://github.com/kadras-io/cartographer-blueprints) package. You can install it from the [Kadras package repository](https://github.com/kadras-io/kadras-packages).
+Cartographer Supply Chains requires the [Cartographer](https://github.com/kadras-io/package-for-cartographer), [Tekton Pipelines](https://github.com/kadras-io/package-for-tekton-pipelines) and [Tekton Catalog](https://github.com/kadras-io/tekton-catalog) packages. You can install them from the [Kadras package repository](https://github.com/kadras-io/kadras-packages).
 
 ### Installation
 
@@ -73,58 +75,6 @@ Verify the installed packages and their status:
 Documentation, tutorials and examples for this package are available in the [docs](docs) folder.
 For documentation specific to Cartographer, check out [cartographer.sh](https://cartographer.sh).
 
-This package provides a few out-of-the-box supply chains you can use as part of your golden paths to production.
-
-### Supply Chain: Basic
-
-The `basic` supply chain provides a simple Cartographer path consisting of the following stages:
-
-* Monitor source code repository with FluxCD;
-* Test source code with Tekton (when configured);
-* Transform application source code into OCI images with kpack;
-* Apply workload conventions (such as Spring Boot) with Cartographer Conventions;
-* Define and configure the workload manifests with Knative;
-* Deploy the workload using Carvel.
-
-```mermaid
-flowchart LR;
-    A(Monitor Source Code)-->B(Test);
-    B-->D(Build Image);
-    D-->F(Apply Conventions);
-    F-->G(Configure Deployment);
-    G-->H(Deploy Workload);
-```
-
-### Supply Chain: Advanced
-
-The `advanced` supply chain provides a Cartographer path consisting of the following stages:
-
-* Monitor source code repository with FluxCD;
-* Test source code with Tekton;
-* Scan source code with Trivy;
-* Transform application source code into OCI images with kpack;
-* Scan image with Trivy;
-* Apply workload conventions (such as Spring Boot) with Cartographer Conventions;
-* Define and configure the workload manifests with Knative and Carvel;
-* Push the workload manifests via GitOps or RegistryOps;
-* Generate the deliverable resource used for deployment on Kubernetes (Carvel or Flux);
-* Deploy the workload using Carvel (optional, if not external delivery).
-
-```mermaid
-flowchart LR;
-  A(Monitor Source Code)-->B(Test);
-  B-->C(Scan Source Code);
-  C-->D(Build Image);
-  D-->E(Scan Image);
-  E-->F(Apply Conventions);
-  F-->G(Configure Deployment);
-  G-->H(Publish Configuration);
-  H-->I(Generate Deliverable);
-  I-->J(Deploy Workload);
-```
-
-This supply chain can be used in a single cluster setup and take care of the application deployment, or in a multicluster setup and generate the deliverable manifest that can be manually applied to a different cluster to deploy the application via GitOps/RegistryOps.
-
 ## 🎯&nbsp; Configuration
 
 The Cartographer Supply Chains package can be customized via a `values.yml` file.
@@ -153,17 +103,19 @@ The Cartographer Supply Chains package has the following configurable properties
 
 | Config | Default | Description |
 |-------|-------------------|-------------|
-| `supply_chain` | `basic` | The type of supply chain to deploy. Options: `basic`, `advanced`. |
+| `supply_chain` | `basic` | The type of supply chains to deploy. Options: `basic`, `advanced`. |
 | `service_account` | `supply-chain` | The default `ServiceAccount` used by the supply chain. |
 | `ca_cert_data` | `""` | PEM-encoded certificate data to trust TLS connections with a custom CA. |
 | `cluster_builder` | `default` | The default `ClusterBuilder` used by kpack. |
-| `external_delivery` | `false` | Whether a deliverable is manually applied to an external Kubernetes cluster. |
+| `tekton_catalog_namespace` | `tekton-catalog` | The namespace where the Tekton Catalog package has been installed. |
+| `external_delivery` | `false` | Whether the application should delivered and deployed automatically on the current Kubernetes cluster or manually to an external cluster. |
 | `git_credentials_secret` | `""` | The Secret containing authentication credentials for Git repositories. |
 | `registry_credentials_secret` | `""` | The Secret containing authentication credentials for the OCI registry. |
-| `registry.server` | `""` | The server of the OCI Registry where the supply chain will publish and consume OCI images. **Required**. |
-| `registry.repository` | `""` | The repository in the OCI Registry where the supply chain will publish and consume OCI images. **Required**. |
+| `registry.server` | `""` | The server of the OCI Registry where the supply chain will publish and consume OCI images. |
+| `registry.repository` | `""` | The repository in the OCI Registry where the supply chain will publish and consume OCI images. |
+| `excluded_blueprints` | `[]` | A list of blueprints (supply chains or templates) to esclude from being created in the cluster. |
 
-Settings for using a GitOps strategy with the supply chain.
+Settings for using a GitOps strategy with the supply chains.
 
 | Config | Default | Description |
 |-------|-------------------|-------------|
@@ -194,7 +146,6 @@ This project is licensed under the **Apache License 2.0**. See [LICENSE](LICENSE
 
 This package is inspired by:
 
-* the [examples](https://github.com/vmware-tanzu/cartographer/tree/main/examples) in the Cartographer project;
 * the original cartographer-catalog package used in [Tanzu Community Edition](https://github.com/vmware-tanzu/community-edition) before its retirement;
-* the [set of supply chains](https://github.com/vrabbi/tap-oss/tree/main/packages/ootb-supply-chains) included in an example of Tanzu Application Platform OSS stack.
+* the [set of supply chains](https://github.com/vrabbi/tap-oss/tree/main/packages/ootb-supply-chains) developed by [Scott Rosenberg](https://vrabbi.cloud) in an example of Tanzu Application Platform OSS stack;
 * the [set of supply chains](https://github.com/LittleBaiBai/tap-playground/tree/main/supply-chains) included in the playground for Tanzu Application Platform.

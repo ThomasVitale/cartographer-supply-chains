@@ -1,22 +1,23 @@
 #@data/values-schema
 ---
 
-#@schema/desc "The type of supply chain to deploy. Options: `basic`, `advanced`."
+#@schema/desc "The type of supply chains to deploy. Options: `basic`, `advanced`."
 #@schema/validation one_of=["basic", "advanced"]
 supply_chain: basic
 
 #@schema/desc "The default `ServiceAccount` used by the supply chain."
-#@schema/validation min_len=1
 service_account: supply-chain
 
 #@schema/desc "PEM-encoded certificate data to trust TLS connections with a custom CA."
 ca_cert_data: ""
 
 #@schema/desc "The default `ClusterBuilder` used by kpack."
-#@schema/validation min_len=1
 cluster_builder: default
 
-#@schema/desc "Whether a deliverable is manually applied to an external Kubernetes cluster."
+#@schema/desc "The namespace where the Tekton Catalog package has been installed."
+tekton_catalog_namespace: tekton-catalog
+
+#@schema/desc "Whether the application should delivered and deployed automatically on the current Kubernetes cluster or manually to an external cluster."
 external_delivery: false
 
 #@schema/desc "The Secret containing authentication credentials for Git repositories."
@@ -28,13 +29,15 @@ registry_credentials_secret: ""
 #@schema/desc "Settings for the OCI Registry used by the supply chain."
 registry:
   #@schema/desc "The server of the OCI Registry where the supply chain will publish and consume OCI images."
-  #@schema/validation min_len=1
   server: ""
   #@schema/desc "The repository in the OCI Registry where the supply chain will publish and consume OCI images."
-  #@schema/validation min_len=1
   repository: ""
 
-#@schema/desc "Settings for using a GitOps strategy with the supply chain."
+#@schema/desc "A list of blueprints (supply chains or templates) to esclude from being created in the cluster."
+excluded_blueprints:
+  - ""
+
+#@schema/desc "Settings for using a GitOps strategy with the supply chains."
 gitops:
 
   #@schema/desc "Whether to commit configuration changes to Git directly (`direct`) or via a pull request (`pull_request`). If `none`, no GitOps strategy is applied."

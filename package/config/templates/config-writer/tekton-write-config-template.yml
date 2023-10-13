@@ -1,0 +1,130 @@
+#@ load("@ytt:data", "data")
+
+#@ if/end "tekton-write-config-template" not in data.values.excluded_blueprints:
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: tekton-write-config-template
+  annotations:
+    doc: |
+      Consumes application deployment configuration and executes the configured Tekton
+      task on every detected input change to push the configuration to a registry or repository.
+spec:
+  params:
+    - name: ca_cert_data
+      default: ""
+    - name: gitops
+      default: {}
+    - name: pipelineCatalogNamespace
+      default: #@ data.values.tekton_catalog_namespace
+    - name: registry
+      default: {}
+    - name: serviceAccount
+      default: default
+
+  lifecycle: tekton
+
+  ytt: |
+    #@ load("@ytt:assert", "assert")
+    #@ load("@ytt:base64", "base64")
+    #@ load("@ytt:data", "data")
+    #@ load("@ytt:json", "json")
+
+    #@ def param(key):
+    #@   if not key in data.values.params:
+    #@     return None
+    #@   end
+    #@   return data.values.params[key]
+    #@ end
+
+    #@ def merge_labels(fixed_values):
+    #@   labels = {}
+    #@   if hasattr(data.values.workload.metadata, "labels"):
+    #@     labels.update(data.values.workload.metadata.labels)
+    #@   end
+    #@   labels.update(fixed_values)
+    #@   return labels
+    #@ end
+
+    #@ def oci_bundle():
+    #@   return "/".join([
+    #@    data.values.params.registry.server,
+    #@    data.values.params.registry.repository,
+    #@    "-".join([
+    #@      data.values.workload.metadata.name,
+    #@      data.values.workload.metadata.namespace,
+    #@      "bundle",
+    #@    ])
+    #@   ]) + ":" + data.values.workload.metadata.uid
+    #@ end
+
+    #@ def is_gitops_enabled():
+    #@   if param("gitops")["strategy"] == "none":
+    #@     return False
+    #@   end
+    #@   if 'server_address' in param("gitops") or 'repository.owner' in param("gitops") or 'repository.name' in param("gitops"):
+    #@     'server_address' in param("gitops") or assert.fail("missing param: gitops.server_address")
+    #@     'owner' in param("gitops")["repository"] or assert.fail("missing param: gitops.repository.owner")
+    #@     'name' in param("gitops")["repository"] or assert.fail("missing param: gitops.repository.name")
+    #@   end
+    #@   return True
+    #@ end
+
+    #@ def strip_trailing_slash(some_string):
+    #@   if some_string[-1] == "/":
+    #@     return some_string[:-1]
+    #@   end
+    #@   return some_string
+    #@ end
+
+    #@ def git_repository():
+    #@   strip_trailing_slash(data.values.params.gitops.server_address)
+    #@   return "/".join([
+    #@     strip_trailing_slash(data.values.params.gitops.server_address),
+    #@     strip_trailing_slash(data.values.params.gitops.repository.owner),
+    #@     data.values.params.gitops.repository.name,
+    #@   ]) + ".git"
+    #@ end
+
+    ---
+    apiVersion: tekton.dev/v1
+    kind: TaskRun
+    metadata:
+      generateName: #@ data.values.workload.metadata.name + "-config-writer-"
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "config-writer" })
+    spec:
+      serviceAccountName: #@ data.values.params.serviceAccount
+      taskRef:
+        resolver: cluster
+        params:
+        - name: kind
+          value: task
+        - name: name
+          value: #@ "git-write-config" if is_gitops_enabled() else "oci-write-config"
+        - name: namespace
+          value: #@ data.values.params.pipelineCatalogNamespace
+      params: 
+        #@ if is_gitops_enabled():
+        - name: git_repository
+          value: #@ git_repository()
+        - name: git_branch
+          value: #@ param("gitops")["target_branch"]
+        - name: git_user_name
+          value: #@ param("gitops")["user"]["name"]
+        - name: git_user_email
+          value: #@ param("gitops")["user"]["email"]
+        - name: git_commit_message
+          value: #@ param("gitops")["commit"]["message"]
+        - name: git_files
+          value: #@ base64.encode(json.encode(data.values.config))
+        - name: sub_path
+          value: #@ "config/" + data.values.workload.metadata.namespace + "/" + data.values.workload.metadata.name
+        #@ else:
+        - name: files
+          value: #@ base64.encode(json.encode(data.values.config))
+        - name: bundle
+          value: #@ oci_bundle()
+        - name: ca_cert_data
+          value: #@ param("ca_cert_data")
+        #@ end

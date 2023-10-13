@@ -12,10 +12,10 @@ The result:
 
 ```shell
 📦 Supply Chain Security Related artifacts for an image: ghcr.io/kadras-io/cartographer-supply-chains
-└── 💾 Attestations for an image tag: ghcr.io/kadras-io/cartographer-supply-chains:sha256-75d932ea4d326c7e104ae1403b2999d964f71282c11d521b98e06094dd0317f3.att
-   └── 🍒 sha256:e3ace2d7101a4af2f93921a6e939081f5eb984e73f00b96afbb9ddde3c535b58
-└── 🔐 Signatures for an image tag: ghcr.io/kadras-io/cartographer-supply-chains:sha256-75d932ea4d326c7e104ae1403b2999d964f71282c11d521b98e06094dd0317f3.sig
-   └── 🍒 sha256:f25ac25a6a21cd4ade2753e39a4430ca48159da9fd789e5ba175ce779faaf88e
+└── 💾 Attestations for an image tag: ghcr.io/kadras-io/cartographer-supply-chains:sha256-de2b5c420187564a7bf85dfed086bd6d90830c2d3e7807422864956ffd57079c.att
+   └── 🍒 sha256:168c3ff7833364cfdb1ee29d0d0751a4daec6fb0001e497ad0ad2e36e667e309
+└── 🔐 Signatures for an image tag: ghcr.io/kadras-io/cartographer-supply-chains:sha256-de2b5c420187564a7bf85dfed086bd6d90830c2d3e7807422864956ffd57079c.sig
+   └── 🍒 sha256:42c104040c56cc2d4f4263234e8d1f6515457895805b1f0efb19c1c7ff5ae4d1
 ```
 
 You can verify the signature and its claims:

@@ -1,0 +1,30 @@
+metadata:
+  name: kpack-template
+  description: "template requiring 'source' input"
+
+given:
+  workload: workload.yaml
+  template:
+    path: ../../../../package/config/templates/image/kpack-template.yml
+  mockSupplyChain:
+    blueprintInputs:
+      sources:
+        source:
+          url: source-code-url
+          revision: source-code-revision
+      images:
+        some-unused-name:
+          image: some-image-location
+    blueprintParams:
+      - name: "registry"
+        value:
+          server: ghcr.io
+          repository: mygithuborg/carto
+
+expected: expected.yaml
+
+compareOptions:
+  ignoreMetadataFields:
+    - labels
+    - ownerReferences
+    - namespace
