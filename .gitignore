@@ -2,6 +2,7 @@
 carvel-artifacts/
 repo/
 schema-openapi.yml
+test/e2e
 
 ### KUTTL ###
 test/integration/kubeconfig

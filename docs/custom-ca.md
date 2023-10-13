@@ -1,6 +1,6 @@
 # Configuring a Self-Signed Certificate
 
-If you need to interact with a private registry or Git server using a self-signed certificate, you can pass it as a PEM-encoded bundle when installing/upgrading the package. The SupplyChain will pass it down to the components that need it.
+If you need to interact with a private registry or Git server using a self-signed certificate, you can pass it as a PEM-encoded bundle when installing/upgrading the package. The supply chains will pass it down to the components that need it.
 
 ```yaml
 ca_cert_data: |

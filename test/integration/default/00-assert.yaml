@@ -2,4 +2,10 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterSupplyChain
 metadata:
-  name: supply-chain-basic
+  name: source-to-url-basic
+
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterSourceTemplate
+metadata:
+  name: flux-source-template

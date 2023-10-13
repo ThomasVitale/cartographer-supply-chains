@@ -1,12 +1,12 @@
 #@ load("@ytt:data", "data")
 #@ load("/helpers.star", "config_writer")
 
-#@ if/end data.values.supply_chain == "basic":
+#@ if/end data.values.supply_chain == "basic" and "source-to-url-basic" not in data.values.excluded_blueprints:
 ---
 apiVersion: carto.run/v1alpha1
 kind: ClusterSupplyChain
 metadata:
-  name: supply-chain-basic
+  name: source-to-url-basic
 spec:
   selector:
     app.kadras.io/workload-type: web
@@ -18,7 +18,7 @@ spec:
     - name: source-provider
       templateRef:
         kind: ClusterSourceTemplate
-        name: supplychain-source-template
+        name: flux-source-template
       params:
         - name: gitCredentialsSecret
           default: #@ data.values.git_credentials_secret

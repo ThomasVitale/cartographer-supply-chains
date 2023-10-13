@@ -14,6 +14,11 @@ prepare: test/setup
 dev: package
 	cd package && kctrl dev -f package-resources.yml --local -y
 
+# Install e2e
+e2e-default: package
+	kubectl config set-context --current --namespace=tests
+	cd package && ytt -f ../test/e2e/default -f package-resources.yml | kctrl dev -f- --local -y
+
 # Clean development environment
 clean:
 	cd package && kctrl dev -f package-resources.yml --local -y --delete 

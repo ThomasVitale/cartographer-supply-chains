@@ -1,0 +1,12 @@
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: demo-workload-name
+  namespace: demo-workload-namespace
+spec:
+  serviceAccountName: demo-workload-sa
+  source:
+    git:
+      ref:
+        branch: main
+      url: https://github.com/thomasvitale/band-service

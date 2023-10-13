@@ -6,6 +6,4 @@ metadata:
   namespace: tests
 stringData:
   values.yaml: |
-    registry:
-      server: ghcr.io
-      repository: thomasvitale/carto
+    # Default configuration

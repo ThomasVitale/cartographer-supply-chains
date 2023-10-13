@@ -1,12 +1,12 @@
 #@ load("@ytt:data", "data")
 #@ load("/helpers.star", "config_writer")
 
-#@ if/end data.values.supply_chain == "advanced":
+#@ if/end data.values.supply_chain == "advanced" and "source-to-url-advanced" not in data.values.excluded_blueprints:
 ---
 apiVersion: carto.run/v1alpha1
 kind: ClusterSupplyChain
 metadata:
-  name: supply-chain-advanced
+  name: source-to-url-advanced
 spec:
   selector:
     app.kadras.io/workload-type: web
@@ -18,7 +18,7 @@ spec:
     - name: source-provider
       templateRef:
         kind: ClusterSourceTemplate
-        name: supplychain-source-template
+        name: flux-source-template
       params:
         - name: gitCredentialsSecret
           default: #@ data.values.git_credentials_secret
@@ -121,7 +121,7 @@ spec:
       templateRef:
         kind: ClusterConfigTemplate
         options:
-          - name: deliverable-carvel-app-config-template
+          - name: deliverable-carvel-app-template
             selector:
               matchLabels:
                 app.kadras.io/deliverable-type: carvel-app

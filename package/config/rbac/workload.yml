@@ -1,0 +1,39 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: default-supply-chain-workload
+  labels:
+    platform.kadras.io/aggregate-to-supply-chain-workload: "true"
+rules:
+
+  #! Core
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "create", "patch", "update", "delete", "deletecollection"]
+  
+  #! Cartographer
+  - apiGroups: ["carto.run"]
+    resources: ["runnables"]
+    verbs: ["get", "list", "watch", "create", "patch", "update", "delete", "deletecollection"]
+  - apiGroups: ["carto.run"]
+    resources: ["workloads/finalizers", "runnables/finalizers"]
+    verbs: ["update"]
+  - apiGroups: ["conventions.carto.run"]
+    resources: ["podintents"]
+    verbs: ["get", "list", "watch", "create", "patch", "update", "delete", "deletecollection"]
+  
+  #! Flux
+  - apiGroups: ["source.toolkit.fluxcd.io"]
+    resources: ["gitrepositories", "ocirepositories"]
+    verbs: ["get", "list", "watch", "create", "patch", "update", "delete", "deletecollection"]
+  
+  #! kpack
+  - apiGroups: ["kpack.io"]
+    resources: ["images"]
+    verbs: ["get", "list", "watch", "create", "patch", "update", "delete", "deletecollection"]
+
+  #! Tekton
+  - apiGroups: ["tekton.dev"]
+    resources: ["pipelineruns", "taskruns"]
+    verbs: ["get", "list", "watch", "create", "patch", "update", "delete", "deletecollection"]
