@@ -1,0 +1,46 @@
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: java-test-pipeline
+  labels:
+    app.kadras.io/pipeline: test
+    app.kadras.io/language: java
+spec:
+  description: Runs tests for a Java application using Gradle or Maven.
+  params:
+    - name: source-url
+    - name: source-revision
+    - name: source-subpath
+  tasks:
+    - name: test
+      params:
+        - name: source-url
+          value: $(params.source-url)
+        - name: source-revision
+          value: $(params.source-revision)
+        - name: source-subpath
+          value: $(params.source-subpath)
+      taskSpec:
+        params:
+          - name: source-url
+          - name: source-revision
+          - name: source-subpath
+        steps:
+          - name: test
+            image: cgr.dev/chainguard/jdk
+            securityContext:
+              runAsNonRoot: true
+            script: |-
+              wget -qO- $(params.source-url) | tar xvz -m
+              cd $(params.source-subpath)
+              if [ -f gradlew ]; then
+                chmod +x ./gradlew
+                ./gradlew build --no-daemon
+              elif [ -f mvnw ]; then
+                chmod +x ./mvnw
+                ./mvnw test
+              else
+                echo "ERROR. This pipeline supports only Java projects using the Maven or Gradle wrappers."
+                exit 1
+              fi

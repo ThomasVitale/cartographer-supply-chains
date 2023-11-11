@@ -1,0 +1,152 @@
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: git-write-config-and-pr
+spec:
+  description: |-
+    Consumes application deployment configuration files as a Base64-encoded JSON,
+    pushes them to a Git repository under a given path, and opens a pull request
+    to merge the changes into a given target branch.
+  params:
+    - name: repository_owner
+      description: The owner of the Git repository (username or organization name).
+      type: string
+    - name: repository_name
+      description: The name of the Git repository.
+      type: string
+    - name: commit_branch
+      description: The branch to use to open a pull request. If empty, a random name is generated.
+      type: string
+    - name: git_user_email
+      description: The email of the user interacting with the Git repository.
+      type: string
+      default: "cartographer@kadras.io"
+    - name: git_user_name
+      description: The name of the user interacting with the Git repository.
+      type: string
+      default: "cartographer"
+    - name: git_commit_message
+      description: The commit message to use when pushing configuration changes to Git.
+      type: string
+      default: "Update from Cartographer"
+    - name: git_files
+      description: The configuration files to push to the Git repository, provided as a Base64-encoded JSON map.
+      type: string
+    - name: git_server_address
+      type: string
+      description: The location of the server hosting the specified Git repository.
+      default: https://github.com
+    - name: git_server_kind
+      type: string
+      description: The type of Git server where to open the pull request (e.g. github, gitlab, gitea).
+      default: github
+    - name: pull_request_title
+      type: string
+      description: The title of the pull request.
+    - name: pull_request_body
+      type: string
+      description: The message body of the pull request.
+      default: ""
+    - name: base_branch
+      type: string
+      description: The target branch where to push configuration changes.
+      default: main
+    - name: sub_path
+      description: The path in the Git repository where to write the configuration files.
+      type: string
+      default: "config"
+  results:
+    - name: pr-url
+      description: The URL of the successfully created pull request.
+  workspaces:
+    - name: config-dir
+      mountPath: /workspace/config-dir
+    - name: repo-dir
+      mountPath: /workspaces/repo-dir
+  steps:
+    - name: prepare-config-files
+      image: paketobuildpacks/build-jammy-base
+      workingDir: /tekton/home
+      securityContext:
+        runAsNonRoot: true
+      script: |
+        #!/usr/bin/env sh
+
+        set -eu
+
+        echo '$(params.git_files)' | base64 -d > files.json
+        eval "$(cat files.json | jq -r 'to_entries | .[] | @sh "mkdir -p $(dirname \(.key)) && echo \(.value) > \(.key) && mv \(.key) $(workspaces.config-dir.path)/"')"
+
+    - name: git-commit-and-push
+      image: cgr.dev/chainguard/git
+      securityContext:
+        runAsNonRoot: true
+      script: |
+        #!/usr/bin/env sh
+
+        set -eux
+
+        # Configure Git
+        git config --global user.email "$(params.git_user_email)"
+        git config --global user.name "$(params.git_user_name)"
+
+        # Compute branch name
+        commit_branch="$(params.commit_branch)"
+        if [ -z "$commit_branch" ]; then
+          commit_branch=$(date +%s | base64)
+        fi
+
+        # Compute repository URI
+        git_repository="$(params.git_server_address)/$(params.repository_owner)/$(params.repository_name).git"
+
+        # Check out target branch or create it if it doesn't exist
+        if git clone --depth 1 -b $commit_branch $git_repository ./repo; then
+          cd ./repo
+        else
+          git clone --depth 1 $git_repository ./repo
+          cd ./repo
+          git checkout -b $commit_branch
+        fi
+
+        # Navigate to subpath
+        mkdir -p $(params.sub_path)
+        cd $(params.sub_path)
+
+        # Add configuration files
+        cp $(workspaces.config-dir.path)/* .
+        git add .
+
+        # Commit and push configuration files
+        git commit -m "$(params.git_commit_message)" --allow-empty
+        git push origin $commit_branch
+
+        # Export branch name
+        echo "$commit_branch" > /workspaces/repo-dir/commit_branch
+
+    - name: open-pr
+      image: ghcr.io/jenkins-x/jx-scm
+      workingDir: /tekton/home
+      script: |
+        #!/usr/bin/env sh
+
+        set -eu
+
+        head_branch=$(cat /workspaces/repo-dir/commit_branch | tr -d '\n')
+
+        token=$(cat $(credentials.path)/.git-credentials | sed -e 's/https:.*://' | sed -e 's/@.*//')
+
+        jx-scm pull-request create \
+          --kind "$(params.git_server_kind)" \
+          --server "$(params.git_server_address)" \
+          --token "$token" \
+          --owner "$(params.repository_owner)" \
+          --name "$(params.repository_name)" \
+          --head "$head_branch" \
+          --title "$(params.pull_request_title)" \
+          --body "$(params.pull_request_body)" \
+          --base "$(params.base_branch)" \
+          --allow-update 2>&1 |
+        tee stdoutAndSterr.txt
+
+        cat stdoutAndSterr.txt | sed -n -e 's/^.*\. url: //p' > $(results.pr-url.path)

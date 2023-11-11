@@ -25,7 +25,7 @@ It handles several activities like source code watching, testing, building, scan
 
 ### Dependencies
 
-Cartographer Supply Chains requires the [Cartographer](https://github.com/kadras-io/package-for-cartographer), [Tekton Pipelines](https://github.com/kadras-io/package-for-tekton-pipelines) and [Tekton Catalog](https://github.com/kadras-io/tekton-catalog) packages. You can install them from the [Kadras package repository](https://github.com/kadras-io/kadras-packages).
+Cartographer Supply Chains requires the [Cartographer](https://github.com/kadras-io/package-for-cartographer) and [Tekton Pipelines](https://github.com/kadras-io/package-for-tekton-pipelines) packages. You can install them from the [Kadras package repository](https://github.com/kadras-io/kadras-packages).
 
 ### Installation
 
@@ -107,7 +107,6 @@ The Cartographer Supply Chains package has the following configurable properties
 | `service_account` | `supply-chain` | The default `ServiceAccount` used by the supply chain. |
 | `ca_cert_data` | `""` | PEM-encoded certificate data to trust TLS connections with a custom CA. |
 | `cluster_builder` | `default` | The default `ClusterBuilder` used by kpack. |
-| `tekton_catalog_namespace` | `tekton-catalog` | The namespace where the Tekton Catalog package has been installed. |
 | `external_delivery` | `false` | Whether the application should delivered and deployed automatically on the current Kubernetes cluster or manually to an external cluster. |
 | `git_credentials_secret` | `""` | The Secret containing authentication credentials for Git repositories. |
 | `registry_credentials_secret` | `""` | The Secret containing authentication credentials for the OCI registry. |

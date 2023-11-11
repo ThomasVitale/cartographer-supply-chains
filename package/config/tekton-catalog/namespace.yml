@@ -1,0 +1,21 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:overlay", "overlay")
+#@ load("/helpers.star", "tekton_catalog_namespace")
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: #@ tekton_catalog_namespace()
+
+#@overlay/match by=overlay.subset({"kind":"Pipeline"}), expects="1+"
+---
+metadata:
+  #@overlay/match missing_ok=True
+  namespace: #@ tekton_catalog_namespace()
+
+#@overlay/match by=overlay.subset({"kind":"Task"}), expects="1+"
+---
+metadata:
+  #@overlay/match missing_ok=True
+  namespace: #@ tekton_catalog_namespace()

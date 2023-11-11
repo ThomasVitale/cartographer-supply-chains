@@ -14,9 +14,6 @@ ca_cert_data: ""
 #@schema/desc "The default `ClusterBuilder` used by kpack."
 cluster_builder: default
 
-#@schema/desc "The namespace where the Tekton Catalog package has been installed."
-tekton_catalog_namespace: tekton-catalog
-
 #@schema/desc "Whether the application should delivered and deployed automatically on the current Kubernetes cluster or manually to an external cluster."
 external_delivery: false
 

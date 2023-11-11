@@ -1,0 +1,37 @@
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: go-test-pipeline
+  labels:
+    app.kadras.io/pipeline: test
+    app.kadras.io/language: golang
+spec:
+  description: Runs tests for a Go application.
+  params:
+    - name: source-url
+    - name: source-revision
+    - name: source-subpath
+  tasks:
+    - name: test
+      params:
+        - name: source-url
+          value: $(params.source-url)
+        - name: source-revision
+          value: $(params.source-revision)
+        - name: source-subpath
+          value: $(params.source-subpath)
+      taskSpec:
+        params:
+          - name: source-url
+          - name: source-revision
+          - name: source-subpath
+        steps:
+          - name: test
+            image: cgr.dev/chainguard/go
+            securityContext:
+              runAsNonRoot: true
+            script: |-
+              wget -qO- $(params.source-url) | tar xvz -m
+              cd $(params.source-subpath)
+              go test

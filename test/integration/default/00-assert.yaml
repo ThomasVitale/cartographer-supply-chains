@@ -1,4 +1,10 @@
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cartographer-tekton-catalog
+
+---
 apiVersion: carto.run/v1alpha1
 kind: ClusterSupplyChain
 metadata:
