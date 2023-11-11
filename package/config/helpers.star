@@ -7,3 +7,7 @@ def config_writer():
   end
   return "tekton-write-config-template"
 end
+
+def tekton_catalog_namespace():
+  return "cartographer-tekton-catalog"
+end

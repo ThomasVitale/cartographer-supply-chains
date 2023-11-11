@@ -1,4 +1,5 @@
 #@ load("@ytt:data", "data")
+#@ load("/helpers.star", "tekton_catalog_namespace")
 
 #@ if/end "tekton-test-source-template" not in data.values.excluded_blueprints:
 ---
@@ -15,7 +16,7 @@ spec:
     - name: pipelineName
       default: ""
     - name: pipelineCatalogNamespace
-      default: #@ data.values.tekton_catalog_namespace
+      default: #@ tekton_catalog_namespace()
     - name: serviceAccount
       default: default
 

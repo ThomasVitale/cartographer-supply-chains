@@ -1,0 +1,20 @@
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: trivy-scan-image
+  labels:
+    app.kadras.io/task: scan
+    app.kadras.io/scanner: trivy
+    app.kadras.io/target: image
+spec:
+  description: Scans a given OCI image for vulnerabilities with Trivy.
+  params:
+    - name: image
+    - name: trivy-args
+      default:
+        - "--ignore-unfixed"
+  steps:
+    - name: scan
+      image: aquasec/trivy
+      args: ["image", "$(params.trivy-args[*])", "$(params.image)"]

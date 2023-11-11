@@ -1,0 +1,71 @@
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: oci-write-config
+spec:
+  description: |-
+    Consumes application deployment configuration files as a Base64-encoded JSON and
+    pushes them to an OCI registry as an OCI bundle (imgpkg artifact type).
+  params:
+    - name: bundle
+      description: The fully qualified name of the OCI repository where to push the configuration files.
+      type: string
+    - name: files
+      description: The configuration files to push to the OCI registry, provided as a Base64-encoded JSON map.
+      type: string
+    - name: ca_cert_data
+      description: PEM-encoded certificate data for the OCI Registry where to push the configuration files.
+      type: string
+      default: ""
+  workspaces:
+    - name: config-dir
+      mountPath: /workspace/config-dir
+  steps:
+    - name: prepare-config-files
+      image: paketobuildpacks/build-jammy-base
+      workingDir: /tekton/home
+      securityContext:
+        runAsNonRoot: true
+      script: |
+        #!/usr/bin/env sh
+
+        set -eu
+
+        echo '$(params.files)' | base64 -d > files.json
+        eval "$(cat files.json | jq -r 'to_entries | .[] | @sh "mkdir -p $(dirname \(.key)) && echo \(.value) > \(.key) && mv \(.key) $(workspaces.config-dir.path)/"')"
+    
+    - name: publish-oci-bundle
+      image: paketobuildpacks/build-jammy-base
+      workingDir: /tekton/home
+      securityContext:
+        runAsNonRoot: true
+      script: |
+        #!/usr/bin/env bash
+
+        set -eux
+
+        # Install imgpkg
+        mkdir local-bin/
+        curl -L https://carvel.dev/install.sh | K14SIO_INSTALL_BIN_DIR=local-bin bash
+        export PATH=$PWD/local-bin/:$PATH
+
+        # Initialize OCI bundle
+        mkdir -p .imgpkg
+        echo "---
+        apiVersion: imgpkg.carvel.dev/v1alpha1
+        kind: ImagesLock" > ./.imgpkg/images.yml
+
+        # Configure imgpkg
+        imgpkg_params=""
+        if [[ ! -z "$(params.ca_cert_data)" ]]; then
+          certs_dir=$(mktemp -d)
+          echo "$(params.ca_cert_data)" > $certs_dir/cert
+          imgpkg_params="--registry-ca-cert-path=$certs_dir/cert"
+        fi
+
+        # Add configuration files
+        cp $(workspaces.config-dir.path)/* .
+        
+        # Publish config bundle
+        imgpkg push $imgpkg_params -b $(params.bundle) -f .

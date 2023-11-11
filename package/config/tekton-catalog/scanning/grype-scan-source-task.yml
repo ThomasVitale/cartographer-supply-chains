@@ -1,0 +1,36 @@
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: grype-scan-source
+  labels:
+    app.kadras.io/task: scan
+    app.kadras.io/scanner: grype
+    app.kadras.io/target: source
+spec:
+  description: Scans a given application source code directory for vulnerabilities with Grype.
+  params:
+    - name: source-url
+    - name: source-revision
+    - name: source-subpath
+    - name: grype-args
+      default:
+        - "--only-fixed"
+  workspaces:
+    - name: source-dir
+      mountPath: /workspace/source-dir
+  steps:
+    - name: prepare
+      image: paketobuildpacks/build-jammy-base
+      workingDir: /tekton/home
+      securityContext:
+        runAsNonRoot: true
+      script: |-
+        cd `mktemp -d`
+        curl -SL $(params.source-url) | tar xvz -m
+        cd $(params.source-subpath)
+        mv * $(workspaces.source-dir.path)
+    - name: scan
+      image: anchore/grype
+      workingDir: $(workspaces.source-dir.path)
+      args: ["dir:.", "$(params.grype-args[*])"]

@@ -1,0 +1,86 @@
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: git-write-config
+spec:
+  description: |-
+    Consumes application deployment configuration files as a Base64-encoded JSON and
+    pushes them to a Git repository under a given path.
+  params:
+    - name: git_repository
+      description: The Git repository where to push the configuration files.
+      type: string
+    - name: git_branch
+      description: The Git branch where to push the configuration files.
+      type: string
+      default: "main"
+    - name: git_user_email
+      description: The email of the user interacting with the Git repository.
+      type: string
+      default: "cartographer@kadras.io"
+    - name: git_user_name
+      description: The name of the user interacting with the Git repository.
+      type: string
+      default: "cartographer"
+    - name: git_commit_message
+      description: The commit message to use when pushing the configuration files to the Git repository.
+      type: string
+      default: "Update from Cartographer"
+    - name: sub_path
+      description: The path in the Git repository where to write the configuration files.
+      type: string
+      default: "config"
+    - name: git_files
+      description: The configuration files to push to the Git repository, provided as a Base64-encoded JSON map.
+      type: string
+  workspaces:
+    - name: config-dir
+      mountPath: /workspace/config-dir
+  steps:
+    - name: prepare-config-files
+      image: paketobuildpacks/build-jammy-base
+      workingDir: /tekton/home
+      securityContext:
+        runAsNonRoot: true
+      script: |
+        #!/usr/bin/env sh
+
+        set -eu
+
+        echo '$(params.git_files)' | base64 -d > files.json
+        eval "$(cat files.json | jq -r 'to_entries | .[] | @sh "mkdir -p $(dirname \(.key)) && echo \(.value) > \(.key) && mv \(.key) $(workspaces.config-dir.path)/"')"
+
+    - name: git-commit-and-push
+      image: cgr.dev/chainguard/git
+      securityContext:
+        runAsNonRoot: true
+      script: |
+        #!/usr/bin/env sh
+
+        set -eux
+
+        # Configure Git
+        git config --global user.email "$(params.git_user_email)"
+        git config --global user.name "$(params.git_user_name)"
+
+        # Check out target branch or create it if it doesn't exist
+        if git clone --depth 1 -b "$(params.git_branch)" "$(params.git_repository)" ./repo; then
+          cd ./repo
+        else
+          git clone --depth 1 "$(params.git_repository)" ./repo
+          cd ./repo
+          git checkout -b "$(params.git_branch)"
+        fi
+
+        # Navigate to subpath
+        mkdir -p $(params.sub_path)
+        cd $(params.sub_path)
+
+        # Add configuration files
+        cp $(workspaces.config-dir.path)/* .
+        git add .
+
+        # Commit and push configuration files
+        git commit -m "$(params.git_commit_message)" --allow-empty
+        git push origin $(params.git_branch)
