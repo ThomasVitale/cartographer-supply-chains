@@ -17,13 +17,13 @@ commands:
   - script: |
       kubectl config set-context --current --namespace=tests && \
       kapp deploy -a secretgen-controller-package -y \
-        -f https://github.com/kadras-io/package-for-secretgen-controller/releases/download/v0.15.1/package.yml \
-        -f https://github.com/kadras-io/package-for-secretgen-controller/releases/download/v0.15.1/metadata.yml
+        -f https://github.com/kadras-io/package-for-secretgen-controller/releases/download/v0.17.0/package.yml \
+        -f https://github.com/kadras-io/package-for-secretgen-controller/releases/download/v0.17.0/metadata.yml
   - script: |
       kubectl config set-context --current --namespace=tests && \
       kapp deploy -a cert-manager-package -y \
-        -f https://github.com/kadras-io/package-for-cert-manager/releases/download/v1.13.2/package.yml \
-        -f https://github.com/kadras-io/package-for-cert-manager/releases/download/v1.13.2/metadata.yml
+        -f https://github.com/kadras-io/package-for-cert-manager/releases/download/v1.14.3/package.yml \
+        -f https://github.com/kadras-io/package-for-cert-manager/releases/download/v1.14.3/metadata.yml
   - script: |
       kubectl config set-context --current --namespace=tests && \
       kapp deploy -a cartographer-package -y \
