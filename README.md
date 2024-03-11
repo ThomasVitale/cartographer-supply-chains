@@ -6,6 +6,9 @@
 [![The Apache 2.0 license badge](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Follow us on Twitter](https://img.shields.io/static/v1?label=Twitter&message=Follow&color=1DA1F2)](https://twitter.com/kadrasIO)
 
+> **Warning**
+> The Cartographer upstream project is not actively developed anymore. As a consequence, this package has been archived. Check out the [https://github.com/kadras-io/supply-chains](supply-chains) package from the Kadras Engineering Platform as an alternative.
+
 A Carvel package configuring a set of reusable supply chains, templates and pipelines to provide Kubernetes-native paved paths to production using [Cartographer](https://cartographer.sh).
 
 It handles several activities like source code watching, testing, building, scanning, configuring, delivering, and deploying.
